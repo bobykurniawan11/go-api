@@ -9,9 +9,10 @@ import (
 
 type UserController struct{}
 type InputUser struct {
-	Name     string `json:"name" binding:"required"`
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=8"`
+	Name            string `json:"name" binding:"required"`
+	Email           string `json:"email" binding:"required,email"`
+	Password        string `json:"password" binding:"required,min=8"`
+	PasswordConfirm string `json:"password_confirm" binding:"required,eqfield=Password"`
 }
 
 type UpdateUser struct {
