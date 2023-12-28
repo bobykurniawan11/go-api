@@ -1,0 +1,5 @@
+server.port: ":1111"
+database.url: "root:12345678@tcp(127.0.0.1:3306)/starter-go?charset=utf8mb4&parseTime=True&loc=Local"
+fulldatabase.url: "mysql://root:12345678@tcp(localhost:3306)/starter-go?charset=utf8mb4&parseTime=True&loc=Local"
+api.secret: "secret"
+token.life: 3600
