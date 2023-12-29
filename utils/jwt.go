@@ -11,6 +11,9 @@ import (
 	"github.com/google/uuid"
 )
 
+// GenerateToken generates a JWT token for the given user ID.
+// It takes the user ID as input and returns the generated token as a string.
+// If an error occurs during token generation, it is also returned.
 func GenerateToken(id uuid.UUID) (string, error) {
 
 	config := config.GetConfig()
@@ -27,6 +30,11 @@ func GenerateToken(id uuid.UUID) (string, error) {
 
 }
 
+// ExtractToken extracts the token from the request context or query parameter.
+// It first checks if the token is present in the query parameter "token".
+// If not found, it then checks the "Authorization" header for a bearer token.
+// If a valid bearer token is found, it returns the token.
+// If no token is found, it returns an empty string.
 func ExtractToken(c *gin.Context) string {
 	token := c.Query("token")
 	if token != "" {
@@ -39,6 +47,9 @@ func ExtractToken(c *gin.Context) string {
 	return ""
 }
 
+// TokenValid checks if the token in the request context is valid.
+// It extracts the token from the request, parses it, and verifies the signing method and secret.
+// If the token is valid, it returns nil. Otherwise, it returns an error.
 func TokenValid(c *gin.Context) error {
 
 	config := config.GetConfig()
@@ -47,7 +58,7 @@ func TokenValid(c *gin.Context) error {
 	tokenString := ExtractToken(c)
 	_, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(secret), nil
 	})
@@ -57,38 +68,15 @@ func TokenValid(c *gin.Context) error {
 	return nil
 }
 
-// func ExtractTokenID(c *gin.Context) (uuid.UUID, error) {
-
-// 	config := config.GetConfig()
-// 	secret := config.GetString("api.secret")
-// 	tokenString := ExtractToken(c)
-// 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-// 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-// 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-// 		}
-// 		return []byte(secret), nil
-
-// 	})
-// 	if err != nil {
-// 		return uuid.UUID{}, err
-// 	}
-// 	claims, ok := token.Claims.(jwt.MapClaims)
-// 	if ok && token.Valid {
-// 		uid := claims["user_id"]
-
-// 		return uid.(uuid.UUID), nil
-// 	}
-// 	return uuid.UUID{}, nil
-
-// }
-
+// ExtractTokenID extracts the user ID from the JWT token in the given Gin context.
+// It returns the user ID as a UUID and an error if any.
 func ExtractTokenID(c *gin.Context) (uuid.UUID, error) {
 	config := config.GetConfig()
 	secret := config.GetString("api.secret")
 	tokenString := ExtractToken(c)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(secret), nil
 	})
@@ -102,7 +90,7 @@ func ExtractTokenID(c *gin.Context) (uuid.UUID, error) {
 		// Convert uid to string
 		uidStr, ok := uid.(string)
 		if !ok {
-			return uuid.UUID{}, fmt.Errorf("Failed to convert user_id to string")
+			return uuid.UUID{}, fmt.Errorf("failed to convert user_id to string")
 		}
 
 		// Parse string to uuid.UUID

@@ -23,6 +23,10 @@ type UpdateUser struct {
 	Phone string `json:"phone"`
 }
 
+// GetAll retrieves all users from the database and returns them as a JSON response.
+// It handles the GET request to the "/users" endpoint.
+// If an error occurs during the retrieval process, it returns a JSON response with the error message and a 500 status code.
+// If the retrieval is successful, it returns a JSON response with the list of users and a 200 status code.
 func (u UserController) GetAll(c *gin.Context) {
 	var userModel = new(models.User)
 
@@ -35,6 +39,11 @@ func (u UserController) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"users": users})
 }
 
+// CreateUser creates a new user based on the input provided in the request body.
+// It binds the request body to the InputUser struct, validates the input,
+// and then calls the CreateUser method of the userModel to create the user.
+// If successful, it returns the created user in the response body.
+// If there is an error during the process, it returns the appropriate error response.
 func (u UserController) CreateUser(c *gin.Context) {
 	var userModel = new(models.User)
 
@@ -58,6 +67,10 @@ func (u UserController) CreateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"user": user})
 }
 
+// GetUserById retrieves a user by their ID.
+// It takes a gin.Context object as a parameter and uses the ID parameter from the request URL to fetch the user from the database.
+// If the user is found, it returns the user details as a JSON response with HTTP status code 200.
+// If there is an error during the retrieval process, it returns an error message as a JSON response with HTTP status code 500.
 func (u UserController) GetUserById(c *gin.Context) {
 	var userModel = new(models.User)
 
@@ -70,6 +83,11 @@ func (u UserController) GetUserById(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"user": user})
 }
+
+// UpdateUser updates the user information based on the provided data.
+// It retrieves the existing user from the database, updates the specified fields,
+// and saves the updated user back to the database.
+// If any error occurs during the process, it returns the corresponding error response.
 func (u UserController) UpdateUser(c *gin.Context) {
 	var userModel = new(models.User)
 
@@ -112,6 +130,9 @@ func (u UserController) UpdateUser(c *gin.Context) {
 
 }
 
+// DeleteUser deletes a user based on the provided ID.
+// It retrieves the user by ID, deletes it from the database, and returns a JSON response with the deleted user's information.
+// If any error occurs during the process, an error JSON response is returned.
 func (u UserController) DeleteUser(c *gin.Context) {
 	var userModel = new(models.User)
 
