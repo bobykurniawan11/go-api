@@ -1,10 +1,13 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/bobykurniawan11/starter-go/models"
 	"github.com/bobykurniawan11/starter-go/utils"
+
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -116,12 +119,36 @@ func (u AuthController) Me(c *gin.Context) {
 
 func (u AuthController) UploadAvatar(c *gin.Context) {
 	// single file
-	file, _ := c.FormFile("file")
+	file, err := c.FormFile("file")
+	switch err {
+	case nil:
+		// do nothing
+	case http.ErrMissingFile:
+		c.JSON(http.StatusBadRequest, gin.H{"error": "File is required"})
+		return
+	default:
+		log.Printf("Error while receiving the file: %s\n", err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	}
 
 	// Upload the file to specific dst.
 	c.SaveUploadedFile(file, "./uploads/"+file.Filename)
 
 	id, err := utils.ExtractTokenID(c)
+
+	imageStatus, errImage := utils.CheckImage("./uploads/" + file.Filename)
+
+	if errImage != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": errImage.Error()})
+		return
+	}
+
+	if !imageStatus {
+		os.Remove("./uploads/" + file.Filename)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid image"})
+		return
+
+	}
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
